@@ -318,7 +318,8 @@ def search_documents(
     client: Client, 
     query: str, 
     match_count: int = 10, 
-    filter_metadata: Optional[Dict[str, Any]] = None
+    filter_metadata: Optional[Dict[str, Any]] = None,
+    source_filter: Optional[str] = None
 ) -> List[Dict[str, Any]]:
     """
     Search for documents in Supabase using vector similarity.
@@ -328,6 +329,7 @@ def search_documents(
         query: Query text
         match_count: Maximum number of results to return
         filter_metadata: Optional metadata filter
+        source_filter: Optional source ID to filter by
         
     Returns:
         List of matching documents
@@ -337,15 +339,19 @@ def search_documents(
     
     # Execute the search using the match_crawled_pages function
     try:
-        # Only include filter parameter if filter_metadata is provided and not empty
+        # Build parameters for the RPC call
         params = {
             'query_embedding': query_embedding,
             'match_count': match_count
         }
         
-        # Only add the filter if it's actually provided and not empty
+        # Add metadata filter if provided
         if filter_metadata:
-            params['filter'] = filter_metadata  # Pass the dictionary directly, not JSON-encoded
+            params['filter'] = filter_metadata
+        
+        # Add source filter if provided
+        if source_filter:
+            params['source_filter'] = source_filter
         
         result = client.rpc('match_crawled_pages', params).execute()
         

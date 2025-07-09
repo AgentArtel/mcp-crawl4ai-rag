@@ -47,6 +47,7 @@ The Crawl4AI RAG MCP server is just the beginning. Here's where we're headed:
 - **Content Chunking**: Intelligently splits content by headers and size for better processing
 - **Vector Search**: Performs RAG over crawled content, optionally filtering by data source for precision
 - **Source Retrieval**: Retrieve sources available for filtering to guide the RAG process
+- **Backup Population Tool**: Standalone tool for reliable Supabase table population with duplicate handling
 
 ## Tools
 
@@ -407,6 +408,55 @@ Add this server to your MCP configuration for Claude Desktop, Windsurf, or any o
   }
 }
 ```
+
+## Backup Population Tool
+
+The system includes a standalone backup tool (`agent-docs/populate_supabase_backup.py`) for reliable Supabase table population when the main MCP tool encounters issues.
+
+### Features
+
+- **Intelligent Duplicate Handling**: Automatically skips duplicates based on unique constraints
+- **Batch Processing**: Configurable batch sizes for efficient database operations
+- **UPSERT Logic**: Uses upsert instead of insert to handle conflicts gracefully
+- **Data Truncation**: Automatically truncates long fields to fit database constraints
+- **Comprehensive Error Handling**: Catches and reports errors without stopping the process
+- **Detailed Statistics**: Shows exactly what was processed, inserted, and skipped
+- **Dry Run Mode**: Preview what would be inserted without actually inserting
+
+### Usage
+
+```bash
+# Basic population
+python agent-docs/populate_supabase_backup.py
+
+# Clear existing data first (recommended)
+python agent-docs/populate_supabase_backup.py --clear
+
+# Dry run to preview changes
+python agent-docs/populate_supabase_backup.py --dry-run
+
+# Verbose output with detailed progress
+python agent-docs/populate_supabase_backup.py --verbose
+
+# Custom batch size
+python agent-docs/populate_supabase_backup.py --batch-size 50
+```
+
+### When to Use
+
+1. **MCP Tool Failures**: When the main `build_academic_knowledge_graph` MCP tool fails
+2. **Data Corruption**: When Supabase tables become corrupted or incomplete
+3. **Fresh Deployments**: When setting up a new environment
+4. **Data Validation**: When you need to verify data integrity
+
+### Expected Results
+
+- **Departments**: ~35 unique departments
+- **Courses**: ~654 unique courses
+- **Programs**: ~287 unique programs
+- **Total Records**: ~976 records inserted
+
+For detailed usage instructions, see [`agent-docs/BACKUP_TOOL_GUIDE.md`](agent-docs/BACKUP_TOOL_GUIDE.md).
 
 ## Knowledge Graph Architecture
 
